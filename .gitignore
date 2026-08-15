@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Pytest
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+backend/venv/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Generated scan reports
+scan_report.json
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
