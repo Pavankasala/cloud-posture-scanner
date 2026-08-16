@@ -67,13 +67,15 @@ flowchart TD
 
 ---
 
-## Evaluated Security Checks
+## CIS-Aligned Security Checks
+
+Implements five CIS-aligned AWS security posture checks covering S3, IAM, CloudTrail, and EC2 security groups.
 
 | Check ID | AWS Service | Control Evaluation Description |
 | :--- | :--- | :--- |
 | `EC2_SSH_RDP_EXPOSURE` | EC2 | Evaluates associated Security Group rules to detect public ingress on administrative remote management ports (TCP `22` / `3389` exposed to `0.0.0.0/0`). |
 | `S3_ENCRYPTION` | S3 | Verifies whether default Server-Side Encryption (SSE) is configured for stored objects. |
-| `S3_PUBLIC_ACCESS` | S3 | Checks if S3 Public Access Block settings are enabled (`PublicAccessBlockConfiguration`). |
+| `S3_PUBLIC_ACCESS` | S3 | Checks whether S3 Public Access Block settings are enabled. Does not perform a full bucket policy or ACL analysis. |
 | `IAM_MFA` | IAM | Evaluates whether Multi-Factor Authentication (MFA) is enabled for the AWS root account. |
 | `CLOUDTRAIL_ENABLED` | CloudTrail | Verifies if multi-region CloudTrail logging is active and recording management API events. |
 
@@ -391,7 +393,7 @@ backend\tests\test_storage.py .....                                      [100%]
 
 ## Security & Architecture Decisions
 
-1. **Deterministic Data Integrity**: Removed arbitrary security score formulas, risk percentages, or unbacked compliance benchmark claims. Metrics display factual passed vs. failed check counts (`CHECKS PASSED 10 / 12`).
+1. **Deterministic Data Integrity**: Removed arbitrary security score formulas, risk percentages, or unbacked compliance benchmark claims. Metrics display factual passed vs. failed check counts rather than an arbitrary security score.
 2. **Workload S3 Isolation**: Excluded `SCAN_REPORT_BUCKET` from target S3 workload discovery to prevent internal audit artifacts from skewing security findings.
 3. **Graceful Storage Fallback**: Scanner falls back to local in-memory storage if `SCAN_REPORT_BUCKET` is not configured, maintaining non-blocking REST API operations.
 4. **Least-Privilege IAM**: Recommended IAM policy grants strictly required read-only discovery APIs and limits object writes to the designated report bucket.
@@ -403,7 +405,7 @@ backend\tests\test_storage.py .....                                      [100%]
 | Assignment Requirement | Implementation Detail | Status |
 | :--- | :--- | :--- |
 | **AWS Workload Audit** | Evaluates EC2, S3, IAM Root MFA, and CloudTrail using Boto3 API SDK. | **`PASS`** |
-| **Security Check Rules** | Implements deterministic rules (`EC2_SSH_RDP_EXPOSURE`, `S3_ENCRYPTION`, `S3_PUBLIC_ACCESS`, `IAM_MFA`, `CLOUDTRAIL_ENABLED`). | **`PASS`** |
+| **Security Check Rules** | Implements five CIS-aligned checks (`EC2_SSH_RDP_EXPOSURE`, `S3_ENCRYPTION`, `S3_PUBLIC_ACCESS`, `IAM_MFA`, `CLOUDTRAIL_ENABLED`). | **`PASS`** |
 | **REST API Endpoints** | Implements FastAPI endpoints `/scan`, `/instances`, `/buckets`, and `/cis-results`. | **`PASS`** |
 | **Persistent Storage** | Persists scan reports (`latest_scan.json`) to configured S3 bucket (`SCAN_REPORT_BUCKET`) and restores on API startup. | **`PASS`** |
 | **React Dashboard** | Interactive dark UI featuring check summaries, failure highlights, resource tables, and detail drawer. | **`PASS`** |
