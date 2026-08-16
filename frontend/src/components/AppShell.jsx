@@ -31,7 +31,7 @@ export default function AppShell() {
   const [lastScanTime, setLastScanTime] = useState(null);
   const [selectedFinding, setSelectedFinding] = useState(null);
 
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
   const fetchScan = async (isManualTrigger = false) => {
     if (isManualTrigger) {

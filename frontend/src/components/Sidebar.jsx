@@ -7,26 +7,36 @@ import {
   HardDrive, 
   Users, 
   Activity, 
-  Settings, 
-  Cloud 
+  Settings
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, failedCount = 0 }) {
-  const navItems = [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'findings', label: 'Findings', icon: AlertTriangle, badge: failedCount > 0 ? failedCount : null, failBadge: failedCount > 0 },
-    { id: 'resources', label: 'Resources', icon: Cloud },
-    { id: 'ec2', label: 'EC2 Instances', icon: Server },
-    { id: 's3', label: 'S3 Buckets', icon: HardDrive },
-    { id: 'iam', label: 'IAM Posture', icon: Users },
-    { id: 'cloudtrail', label: 'CloudTrail', icon: Activity },
-  ];
+  const renderNavItem = (id, label, Icon, badge = null, isFailBadge = false) => {
+    const isActive = activeTab === id;
+    return (
+      <button
+        key={id}
+        onClick={() => setActiveTab(id)}
+        className={`nav-item ${isActive ? 'active' : ''}`}
+      >
+        <div className="nav-item-left">
+          <Icon size={17} className="nav-icon" />
+          <span>{label}</span>
+        </div>
+        {badge !== null && badge !== undefined && (
+          <span className={`nav-badge ${isFailBadge ? 'fail-badge' : ''}`}>
+            {badge}
+          </span>
+        )}
+      </button>
+    );
+  };
 
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
         <div className="brand-icon">
-          <Shield size={20} />
+          <Shield size={18} />
         </div>
         <div className="brand-text">
           <h1>Cloud Posture</h1>
@@ -35,47 +45,30 @@ export default function Sidebar({ activeTab, setActiveTab, failedCount = 0 }) {
       </div>
 
       <nav className="sidebar-nav">
-        <div className="nav-section-title">Navigation</div>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`nav-item ${isActive ? 'active' : ''}`}
-            >
-              <div className="nav-item-left">
-                <Icon size={16} />
-                <span>{item.label}</span>
-              </div>
-              {item.badge !== undefined && item.badge !== null && (
-                <span className={`nav-badge ${item.failBadge ? 'fail-badge' : ''}`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
+        {renderNavItem('overview', 'Overview', LayoutDashboard)}
 
-        <div className="nav-section-title" style={{ marginTop: '16px' }}>System</div>
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-        >
-          <div className="nav-item-left">
-            <Settings size={16} />
-            <span>Settings</span>
-          </div>
-        </button>
+        <div className="nav-section-title">Security</div>
+        {renderNavItem('findings', 'Findings', AlertTriangle, failedCount > 0 ? failedCount : null, failedCount > 0)}
+        {renderNavItem('iam', 'IAM Posture', Users)}
+        {renderNavItem('cloudtrail', 'CloudTrail', Activity)}
+
+        <div className="nav-section-title">Resources</div>
+        {renderNavItem('ec2', 'EC2 Instances', Server)}
+        {renderNavItem('s3', 'S3 Buckets', HardDrive)}
+
+        <div className="nav-section-title">System</div>
+        {renderNavItem('settings', 'Settings', Settings)}
       </nav>
 
       <div className="sidebar-footer">
-        <div className="env-indicator">
-          <span className="env-dot"></span>
-          <div>
-            <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '12px' }}>ap-south-1</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AWS Account: 640168430986</div>
+        <div className="env-card">
+          <div className="env-header">
+            <span className="env-dot"></span>
+            <span className="env-region">ap-south-1</span>
+          </div>
+          <div className="env-account">
+            <span className="env-label">Account:</span>
+            <span className="env-id">640168430986</span>
           </div>
         </div>
       </div>
