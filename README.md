@@ -4,6 +4,14 @@ A production-grade, lightweight Cloud Security Posture Management (CSPM) applica
 
 ---
 
+## Live Demo
+
+**Frontend:** [https://cloud-posture-scanner-eosin.vercel.app](https://cloud-posture-scanner-eosin.vercel.app)
+
+**Backend API:** [https://cloud-posture-scanner.onrender.com](https://cloud-posture-scanner.onrender.com)
+
+---
+
 ## Architecture & Data Flow
 
 ```mermaid
@@ -183,7 +191,7 @@ Triggers full AWS resource discovery and check evaluation. Persists scan results
   ],
   "storage": {
     "stored": true,
-    "bucket": "cloud-posture-scanner-reports",
+    "bucket": "cloud-posture-scanner-reports-6ce98e50",
     "key": "latest_scan.json"
   }
 }
@@ -329,12 +337,28 @@ Deploying the scanner backend requires read-only discovery permissions and write
 
 ## Deployment Architecture
 
-- **Frontend (Vercel)**: Deployed as a static React single-page application built via Vite (`npm run build`). Configured with environment variable `VITE_API_URL`.
-- **Backend (Render)**: Deployed as a Web Service running Python 3.13 and Uvicorn. Startup command:
+| Component | Platform | URL |
+| :--- | :--- | :--- |
+| Frontend | Vercel | [cloud-posture-scanner-eosin.vercel.app](https://cloud-posture-scanner-eosin.vercel.app) |
+| Backend | Render | [cloud-posture-scanner.onrender.com](https://cloud-posture-scanner.onrender.com) |
+| S3 Report Bucket | AWS S3 | `cloud-posture-scanner-reports-6ce98e50` |
+| Report Object Key | — | `latest_scan.json` |
+
+### Frontend (Vercel)
+- Deployed as a static React SPA built via `npm run build`.
+- Environment variable: `VITE_API_URL` → points to the Render backend URL.
+
+### Backend (Render)
+- Deployed as a Python Web Service running Uvicorn.
+- Startup command:
   ```bash
   uvicorn backend.main:app --host 0.0.0.0 --port $PORT
   ```
-  Configured with environment variables `CORS_ORIGINS`, `SCAN_REPORT_BUCKET`, and AWS credentials.
+- Environment variables:
+  - `CORS_ORIGINS` → Vercel frontend URL
+  - `SCAN_REPORT_BUCKET` → `cloud-posture-scanner-reports-6ce98e50`
+  - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` → IAM credentials
+  - `AWS_DEFAULT_REGION` → `ap-south-1`
 
 ---
 
@@ -347,7 +371,7 @@ The backend contains a complete Pytest test suite covering rule evaluations, API
 python -m pytest
 ```
 
-**Test Execution Output**:
+**Latest Test Execution Output**:
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.13.5, pytest-9.1.1, pluggy-1.6.0
@@ -360,7 +384,7 @@ backend\tests\test_iam_checks.py ..                                      [ 44%]
 backend\tests\test_s3_checks.py .....                                    [ 72%]
 backend\tests\test_storage.py .....                                      [100%]
 
-======================== 18 passed in 1.48s ========================
+======================== 18 passed, 1 warning in 1.73s ========================
 ```
 
 ---
